@@ -3,6 +3,7 @@ import React from "react";
 import Banner from "../Components/Banner";
 import { fakeVehicles } from './../Components/fakeVehicles';
 import VehicleCard from "../Components/VehicleCard";
+import { NavLink } from 'react-router';
 
 const Home =()=>{
     const sortedByDate =[...fakeVehicles].sort((a,b)=>new Date(b.createdAt) -new Date(a.createdAt))
@@ -88,7 +89,33 @@ const Home =()=>{
   </div>
 </section>
 
-     
+      <div className='relative h-[90vh] w-full overflow-hidden mt-10 rounded-2xl '>
+           
+            <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover brightness-75 " src="/happycustomers.mp4"></video>
+
+      <div className="absolute inset-0 bg-black/40" />
+            <div className="text-white relative z-10 flex flex-col items-center justify-center text-center h-full">
+                <h1 className="text-3xl md:text-6xl font-bold drop-shadow-xl">Top-Rated Vehicle Booking Platform In Country</h1>
+
+                <p className="mt-4 text-lg md:text-2xl drop-shadow-lg">Customer Approved. Traveler Trusted.
+                </p>
+
+                <div className='mt-8 flex gap-4'>
+                    <NavLink to="/All-Vehicles" className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg" >
+                    Explore Vehicles</NavLink>
+
+                   
+                </div>
+
+
+
+
+            </div>
+
+        </div>
+
+        
+
       <section className="space-y-3 px-4 md:px-8 lg:px-12">
         <div className="py-16 bg-white rounded-2xl shadow-sm">  
   <div class=" m-auto  text-gray-600 md:px-8 ">
@@ -111,7 +138,9 @@ const Home =()=>{
       </section>
         </div>
 
-        </div>
+        
+
+    </div>    
     )
 }
 

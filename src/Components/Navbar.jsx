@@ -5,7 +5,7 @@ import MyBookings from './../Pages/MyBookings';
 
 const Navbar =()=>{
     return(
-<header class='flex border-b py-2 px-4 sm:px-10 bg-white font-sans min-h-[40px] tracking-wide relative z-50'>
+<header class='flex border-b border-slate-100 spy-2 px-4 sm:px-10 bg-white font-sans min-h-[40px] tracking-wide relative z-50'>
       <div class='flex flex-wrap items-center gap-4 w-full'>
        
           <NavLink to="/"  ><img src="/sport-car.png" alt="Logo" className="w-14 h-14 object-contain" /></NavLink>
