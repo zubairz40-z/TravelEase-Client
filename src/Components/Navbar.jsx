@@ -1,17 +1,41 @@
 import React from "react";
-import { NavLink } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 import MyBookings from './../Pages/MyBookings';
+import { useAuth } from "../Providers/AuthProvider";
+import toast from "react-hot-toast";
 
 
 const Navbar =()=>{
+    const { user,logout}=useAuth();
+    const navigate =useNavigate();
+
+    const navLinkClass =({isActive})=>
+        `px-3 py-1 text-sm font-medium rounded-full ${
+      isActive
+        ? "bg-red-700 text-white"
+        : "text-slate-700 hover:bg-slate-100"
+    }`;
+
+    const handleLogout =()=>{
+        logout()
+        .then(()=>{
+            toast.success("logged Out");
+            navigate("/")
+
+        }).catch((err) => {
+        console.error(err);
+        toast.error("Logout failed");
+      });
+    }
+
     return(
 <header class='flex border-b border-slate-100 spy-2 px-4 sm:px-10 bg-white font-sans min-h-[40px] tracking-wide relative z-50'>
-      <div class='flex flex-wrap items-center gap-4 w-full'>
+      <div class='flex items-center gap-4 w-full'>
        
           <NavLink to="/"  ><img src="/sport-car.png" alt="Logo" className="w-14 h-14 object-contain" /></NavLink>
-       <NavLink to="/"  ><a href="https://readymadeui.com">
-          <h3 class="text-2xl font-semibold">TravelEase</h3>
-        </a> </NavLink>
+       <NavLink to="/"  >
+          <h3 class="text-2xl font-semibold tracking-tight text-slate-900">TravelEase</h3>
+         </NavLink>
 
         <div
           class='lg:!flex lg:flex-auto lg:ml-12 max-lg:hidden max-lg:before:fixed max-lg:before:bg-black max-lg:before:opacity-50 max-lg:before:inset-0 max-lg:before:z-50'>
@@ -71,31 +95,70 @@ Bookings</a>
             </ul>
           </div>
         </div>
+<div className="ml-auto flex items-center gap-4">
+          {/* If user is logged in */}
+          {user ? (
+            <>
+              {/* avatar + name tooltip */}
+              <div
+                className="flex items-center gap-2"
+                title={user.displayName || user.email}
+              >
+                {user.photoURL ? (
+                  <img
+                    src={user.photoURL}
+                    alt={user.displayName || "User"}
+                    className="h-9 w-9 rounded-full object-cover border border-slate-200"
+                  />
+                ) : (
+                  <div className="h-9 w-9 rounded-full bg-red-700 text-white flex items-center justify-center text-sm font-semibold">
+                    {user.displayName?.[0]?.toUpperCase() ||
+                      user.email?.[0]?.toUpperCase()}
+                  </div>
+                )}
+              </div>
 
-        <div class="border-l border-[#333] h-6 max-lg:hidden"></div>
-
-        <div class='flex items-center ml-auto space-x-6'>
-                <NavLink to="/Login"  >
-          <a href='javascript:void(0)' class='hover:text-[#007bff] text-gray-600 block font-bold text-[15px]'>Login</a>
-            </NavLink>
-
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 text-sm rounded font-bold text-white border-2 border-[#c8212c] bg-[#c8212c] transition-all duration-200 hover:bg-transparent hover:text-[#1d294f]"
+              >
+                Log Out
+              </button>
+            </>
+          ) : (
            
+            <>
+              <NavLink to="/Login" className={navLinkClass} >
+                Login
+              </NavLink>
 
-          <NavLink to="/Register"  ><button
-            class='px-4 py-2.5 text-sm rounded font-bold text-white border-2 border-[#c8212c] bg-[#c8212c] transition-all ease-in-out duration-300 hover:bg-transparent hover:text-[#1d294f]'>Register</button>
-            </NavLink> 
+              <NavLink to="/Register">
+                <button className="px-4 py-2.5 text-sm rounded font-bold text-white border-2 border-[#c8212c] bg-[#c8212c] transition-all duration-200 hover:bg-transparent hover:text-[#1d294f]">
+                  Register
+                </button>
+              </NavLink>
+            </>
+          )}
 
-          <button class='lg:hidden'>
-            <svg class="w-7 h-7" fill="#000" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-              <path fill-rule="evenodd"
+         
+          <button className="lg:hidden">
+            <svg
+              className="w-7 h-7"
+              fill="#000"
+              viewBox="0 0 20 20"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                fillRule="evenodd"
                 d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
-                clip-rule="evenodd"></path>
+                clipRule="evenodd"
+              ></path>
             </svg>
           </button>
         </div>
       </div>
     </header>
-    )
-}
+  );
+};
 
 export default Navbar;
