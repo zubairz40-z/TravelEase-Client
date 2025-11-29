@@ -30,7 +30,7 @@ const AllVehicles =()=>{
 
 
     return(
-        <div className="max-w-6xl mx-auto space-y-6 py-8 px-4 md:px-6">
+        <div className="max-w-6xl mx-auto space-y-6 py-10 px-4 md:px-6">
             <header className="space-y-2">
                 <h1 className="text-2xl md:text-3xl font-bold text-slate-900">All Vehicles</h1>
 

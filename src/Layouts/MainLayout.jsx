@@ -5,7 +5,7 @@ import { Outlet } from "react-router";
 
 const MainLayout =()=>{
     return(
-    <div>
+    <div className="bg-slate-50">
         <header>
             <Navbar></Navbar>
         </header>

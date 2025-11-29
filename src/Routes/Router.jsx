@@ -9,6 +9,7 @@ import MyBookings from './../Pages/MyBookings';
 import Register from "../Pages/Register";
 import ErrorPage from "../Pages/ErrorPage";
 import Login from './../Pages/Login';
+import VehicleDetails from "../Pages/VehicleDetails";
 
 
 
@@ -50,6 +51,10 @@ const router = createBrowserRouter([
         path:"*",
         element:<ErrorPage></ErrorPage>
       },
+      {
+        path: "vehicles/:id",
+  element: <VehicleDetails />,
+      }
     ]
   },
 ]);
