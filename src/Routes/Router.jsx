@@ -1,5 +1,5 @@
 import { createBrowserRouter } from "react-router";
-import { RouterProvider } from "react-router/dom";
+import { RouterProvider } from "react-router";
 import Home from "../Pages/Home";
 import MainLayout from './../Layouts/MainLayout';
 import AllVehicles from "../Pages/AllVehicles";
@@ -10,6 +10,9 @@ import Register from "../Pages/Register";
 import ErrorPage from "../Pages/ErrorPage";
 import Login from './../Pages/Login';
 import VehicleDetails from "../Pages/VehicleDetails";
+import PrivateRoute from './PrivateRoute';
+import UpdateVehicles from "../Pages/UpdateVehicle";
+
 
 
 
@@ -28,15 +31,26 @@ const router = createBrowserRouter([
       },
        {
         path:"/Add-Vehicles",
-        element:<AddVehicle></AddVehicle>
+        element:(
+    <PrivateRoute>
+      <AddVehicle></AddVehicle>
+    </PrivateRoute>)
       },
        {
         path:"/My-Vehicles",
-        element:<MyVehicles></MyVehicles>
+        element:(
+    <PrivateRoute>
+      <MyVehicles />
+    </PrivateRoute>
+  ),
       },
        {
         path:"/MyBookings",
-        element:<MyBookings></MyBookings>
+        element:(
+    <PrivateRoute>
+      <MyBookings></MyBookings>
+    </PrivateRoute>
+  ),
       },
       {
       
@@ -53,8 +67,22 @@ const router = createBrowserRouter([
       },
       {
         path: "vehicles/:id",
-  element: <VehicleDetails />,
-      }
+        
+  element:(
+    <PrivateRoute>
+      <VehicleDetails />,
+    </PrivateRoute>
+    
+  ) ,
+      },
+      {
+        path:"update-vehicle/:id",
+        element:(
+          <PrivateRoute>
+            <UpdateVehicles></UpdateVehicles>
+          </PrivateRoute>
+        )
+      },
     ]
   },
 ]);
