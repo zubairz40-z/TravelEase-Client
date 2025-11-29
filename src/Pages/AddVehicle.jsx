@@ -1,9 +1,9 @@
 import React from "react";
 
-const AddVehicles =()=>{
+const AddVehicle =()=>{
     return(
         <h1>Add Vehicles</h1>
     )
 }
 
-export default AddVehicles;
+export default AddVehicle;

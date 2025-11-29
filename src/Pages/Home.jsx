@@ -117,7 +117,7 @@ const Home =()=>{
         
 
       <section className="space-y-3 px-4 md:px-8 lg:px-12">
-        <div className="py-16 bg-white rounded-2xl shadow-sm">  
+        <div className="py-16 p-2 bg-white rounded-2xl shadow-sm">  
   <div class=" m-auto  text-gray-600 md:px-8 ">
       <div className="space-y-6 md:space-y-0 md:flex md:gap-6 lg:items-center lg:gap-12">
         <div className="md:w-5/12 lg:w-5/12">
