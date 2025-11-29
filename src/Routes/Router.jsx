@@ -4,7 +4,7 @@ import Home from "../Pages/Home";
 import MainLayout from './../Layouts/MainLayout';
 import AllVehicles from "../Pages/AllVehicles";
 import MyVehicles from "../Pages/MyVehicles";
-import AddVehicles from "../Pages/AddVehicle";
+import AddVehicle from "../Pages/AddVehicle";
 import MyBookings from './../Pages/MyBookings';
 import Register from "../Pages/Register";
 import ErrorPage from "../Pages/ErrorPage";
@@ -28,7 +28,7 @@ const router = createBrowserRouter([
       },
        {
         path:"/Add-Vehicles",
-        element:<AddVehicles></AddVehicles>
+        element:<AddVehicle></AddVehicle>
       },
        {
         path:"/My-Vehicles",
