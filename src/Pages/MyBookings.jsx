@@ -92,32 +92,59 @@ const MyBookings = () => {
         </p>
       ) : (
         <div className="mt-4 space-y-3">
-          {bookings.map((b) => (
-            <div
-              key={b._id}
-              className="border border-slate-200 rounded-lg p-4 flex items-center justify-between bg-white shadow-sm"
-            >
-              <div>
-                <p className="font-semibold text-slate-900">
-                  {b.vehicleName || "Vehicle"}
-                </p>
-                <p className="text-xs text-slate-500">
-                  Location: {b.location || "N/A"} • Price: $
-                  {b.pricePerDay || 0} / day
-                </p>
-              </div>
-              <button
-                onClick={() => handleCancel(b._id)}
-                className="text-xs px-3 py-1.5 rounded bg-red-600 text-white hover:bg-red-700"
-              >
-                Cancel
-              </button>
-            </div>
-          ))}
-        </div>
+  {bookings.map((b) => (
+    <div
+      key={b._id}
+      className="border border-slate-200 rounded-lg p-4 flex items-center gap-4 bg-white shadow-sm"
+    >
+      {/* Vehicle Image */}
+      <img
+        src={b.coverImage}
+        alt={b.vehicleName}
+        className="h-16 w-24 object-cover rounded-md border"
+      />
+
+      {/* Booking Info */}
+      <div className="flex-1">
+        <p className="font-semibold text-slate-900">
+          {b.vehicleName || "Vehicle"}
+        </p>
+
+        <p className="text-xs text-slate-500">
+          Location: {b.location || "N/A"} • Price: ${b.pricePerDay || 0} / day
+        </p>
+
+        {/* Optional: Date range */}
+        {b.startDate && b.endDate && (
+          <p className="text-[11px] text-slate-400 mt-1">
+            {new Date(b.startDate).toLocaleDateString()} →{" "}
+            {new Date(b.endDate).toLocaleDateString()}
+          </p>
+        )}
+      </div>
+
+      {/* Cancel Button */}
+      <button
+        onClick={() => handleCancel(b._id)}
+        className="text-xs px-3 py-1.5 rounded bg-red-600 text-white hover:bg-red-700"
+      >
+        Cancel
+      </button>
+    </div>
+    
+
+    
+    
+  ))}
+  
+</div>
       )}
     </div>
+
+    
+    
   );
+
 };
 
 export default MyBookings;

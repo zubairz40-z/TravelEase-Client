@@ -5,6 +5,7 @@ import api from "../api/axios";
 import VehicleCard from "../Components/VehicleCard";
 import { NavLink } from 'react-router';
 
+
 const Home =()=>{
   const [latestVehicles, setLatestVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -81,6 +82,8 @@ const Home =()=>{
                 ))}
             </div>
         </section>
+     
+        
 <section className="space-y-4 px-4 md:px-8 lg:px-12">
   <div>
     <h2 className="text-xl md:text-2xl font-bold text-slate-900">
@@ -93,9 +96,10 @@ const Home =()=>{
 
   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
     {categories.map((cat) => (
-      <div
+      <NavLink
         key={cat.name}
-        className="rounded-xl overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow border border-slate-200"
+        to={`/All-Vehicles?category=${cat.name}`}
+        className="rounded-xl overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow border border-slate-200 block"
       >
         {/* Category Image */}
         <div className="h-24 md:h-32 overflow-hidden">
@@ -113,10 +117,11 @@ const Home =()=>{
             Explore the best {cat.name.toLowerCase()} options
           </p>
         </div>
-      </div>
+      </NavLink>
     ))}
   </div>
 </section>
+
 
       <div className='relative h-[90vh] w-full overflow-hidden mt-10 rounded-2xl '>
            
