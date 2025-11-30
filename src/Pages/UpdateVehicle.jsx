@@ -2,26 +2,14 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import api from "../api/axios";
 import toast from "react-hot-toast";
-import { useAuth } from "../Providers/AuthProvider";
 
 const UpdateVehicles = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
 
-  const [formData, setFormData] = useState({
-    vehicleName: "",
-    owner: "",
-    category: "",
-    pricePerDay: "",
-    location: "",
-    availability: "Available",
-    coverImage: "",
-    description: "",
-  });
-
+  const [vehicle, setVehicle] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [updating, setUpdating] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
   // 🔹 Fetch existing vehicle data
@@ -32,18 +20,7 @@ const UpdateVehicles = () => {
     api
       .get(`/vehicles/${id}`)
       .then((res) => {
-        const v = res.data;
-
-        setFormData({
-          vehicleName: v.vehicleName || "",
-          owner: v.owner || user?.displayName || "",
-          category: v.category || "",
-          pricePerDay: v.pricePerDay || "",
-          location: v.location || "",
-          availability: v.availability || "Available",
-          coverImage: v.coverImage || "",
-          description: v.description || "",
-        });
+        setVehicle(res.data);
       })
       .catch((err) => {
         console.error(err);
@@ -52,41 +29,43 @@ const UpdateVehicles = () => {
       .finally(() => {
         setLoading(false);
       });
-  }, [id, user?.displayName]);
+  }, [id]);
 
-  // 🔹 Handle input changes
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    setFormData((prev) => ({
-      ...prev,
-      [name]: name === "pricePerDay" ? Number(value) : value,
-    }));
-  };
-
-  // 🔹 Handle update submit
   const handleSubmit = (e) => {
     e.preventDefault();
-    setUpdating(true);
-    setError("");
+    if (!vehicle) return;
+
+    const form = e.target;
+
+    const updatedVehicle = {
+      vehicleName: form.vehicleName.value,
+      owner: form.owner.value,
+      category: form.category.value,
+      pricePerDay: Number(form.pricePerDay.value),
+      location: form.location.value,
+      availability: form.availability.value,
+      coverImage: form.coverImage.value,
+      description: form.description.value,
+      // userEmail stays same in DB (we don't overwrite it here)
+    };
+
+    setSaving(true);
 
     api
-      .put(`/vehicles/${id}`, formData)
-      .then((res) => {
+      .put(`/vehicles/${id}`, updatedVehicle)
+      .then(() => {
         toast.success("Vehicle updated successfully");
-        navigate("/My-Vehicles"); // go back to My Vehicles
+        navigate("/My-Vehicles");
       })
       .catch((err) => {
         console.error(err);
-        setError("Failed to update vehicle.");
         toast.error("Failed to update vehicle");
       })
       .finally(() => {
-        setUpdating(false);
+        setSaving(false);
       });
   };
 
-  // 🔹 Loading / error states
   if (loading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
@@ -95,10 +74,12 @@ const UpdateVehicles = () => {
     );
   }
 
-  if (error) {
+  if (error || !vehicle) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
-        <p className="text-sm text-red-600">{error}</p>
+        <p className="text-sm text-red-600">
+          {error || "Vehicle not found."}
+        </p>
       </div>
     );
   }
@@ -109,7 +90,7 @@ const UpdateVehicles = () => {
         Update Vehicle
       </h1>
       <p className="text-sm text-slate-600 mb-6">
-        Modify the details of your vehicle and save the changes.
+        Edit the details of your listed vehicle and save the changes.
       </p>
 
       <form
@@ -124,9 +105,8 @@ const UpdateVehicles = () => {
             <input
               type="text"
               name="vehicleName"
+              defaultValue={vehicle.vehicleName}
               required
-              value={formData.vehicleName}
-              onChange={handleChange}
               className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-red-600"
             />
           </div>
@@ -138,9 +118,8 @@ const UpdateVehicles = () => {
             <input
               type="text"
               name="owner"
+              defaultValue={vehicle.owner}
               required
-              value={formData.owner}
-              onChange={handleChange}
               className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-red-600"
             />
           </div>
@@ -153,9 +132,8 @@ const UpdateVehicles = () => {
             </label>
             <select
               name="category"
+              defaultValue={vehicle.category}
               required
-              value={formData.category}
-              onChange={handleChange}
               className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-red-600"
             >
               <option value="">Select category</option>
@@ -173,10 +151,9 @@ const UpdateVehicles = () => {
             <input
               type="number"
               name="pricePerDay"
+              defaultValue={vehicle.pricePerDay}
               required
               min="0"
-              value={formData.pricePerDay}
-              onChange={handleChange}
               className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-red-600"
             />
           </div>
@@ -190,9 +167,8 @@ const UpdateVehicles = () => {
             <input
               type="text"
               name="location"
+              defaultValue={vehicle.location}
               required
-              value={formData.location}
-              onChange={handleChange}
               className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-red-600"
             />
           </div>
@@ -203,9 +179,8 @@ const UpdateVehicles = () => {
             </label>
             <select
               name="availability"
+              defaultValue={vehicle.availability}
               required
-              value={formData.availability}
-              onChange={handleChange}
               className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-red-600"
             >
               <option value="Available">Available</option>
@@ -221,9 +196,8 @@ const UpdateVehicles = () => {
           <input
             type="text"
             name="coverImage"
+            defaultValue={vehicle.coverImage}
             required
-            value={formData.coverImage}
-            onChange={handleChange}
             className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-red-600"
           />
         </div>
@@ -235,19 +209,18 @@ const UpdateVehicles = () => {
           <textarea
             name="description"
             rows="3"
+            defaultValue={vehicle.description}
             required
-            value={formData.description}
-            onChange={handleChange}
             className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-red-600"
           ></textarea>
         </div>
 
         <button
           type="submit"
-          disabled={updating}
+          disabled={saving}
           className="w-full mt-2 py-2.5 rounded-lg bg-red-700 text-white text-sm font-semibold hover:bg-red-800 disabled:bg-slate-400 disabled:cursor-not-allowed"
         >
-          {updating ? "Updating..." : "Update Vehicle"}
+          {saving ? "Updating..." : "Update Vehicle"}
         </button>
       </form>
     </div>
@@ -255,3 +228,4 @@ const UpdateVehicles = () => {
 };
 
 export default UpdateVehicles;
+

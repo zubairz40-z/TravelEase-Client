@@ -46,7 +46,6 @@ const MyBookings = () => {
       });
   };
 
-  // 🌟 If user is not logged in
   if (!user?.email) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
@@ -57,7 +56,6 @@ const MyBookings = () => {
     );
   }
 
-  // 🌟 Loading state
   if (loading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
@@ -66,7 +64,6 @@ const MyBookings = () => {
     );
   }
 
-  // 🌟 Error state
   if (error) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
@@ -80,52 +77,38 @@ const MyBookings = () => {
       <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">
         My Bookings
       </h1>
-      <p className="text-sm text-red-600">
-        All the vehicles you have booked will appear here.
+      <p className="text-sm text-slate-600">
+        All the vehicles you have booked will be shown here.
       </p>
 
-      <p className="text-xs text-slate-500 mb-4">
-        Showing bookings for: <span className="font-medium">{user.email}</span>
+      <p className="text-xs text-slate-500 mb-4 mt-1">
+        Showing bookings for:{" "}
+        <span className="font-medium">{user.email}</span>
       </p>
 
-      {/* 🌟 Empty state */}
       {bookings.length === 0 ? (
-        <p className="text-sm text-slate-600 mt-6">No bookings found.</p>
+        <p className="text-sm text-slate-500 mt-4">
+          You don’t have any bookings yet.
+        </p>
       ) : (
-        <div className="grid gap-4 mt-6">
-          {bookings.map((booking) => (
+        <div className="mt-4 space-y-3">
+          {bookings.map((b) => (
             <div
-              key={booking._id}
-              className="p-4 border border-slate-200 rounded-xl bg-white shadow-sm flex justify-between items-center"
+              key={b._id}
+              className="border border-slate-200 rounded-lg p-4 flex items-center justify-between bg-white shadow-sm"
             >
               <div>
-                <h3 className="font-semibold text-slate-900">
-                  {booking.vehicleName}
-                </h3>
-
-                <p className="text-xs text-slate-600">
-                  Location: {booking.location}
+                <p className="font-semibold text-slate-900">
+                  {b.vehicleName || "Vehicle"}
                 </p>
-
-                {/* 🌟 Show Date Range */}
-                {booking.startDate && booking.endDate && (
-                  <p className="text-xs text-slate-500 mt-1">
-                    Trip:{" "}
-                    {new Date(booking.startDate).toLocaleDateString()} →{" "}
-                    {new Date(booking.endDate).toLocaleDateString()}
-                  </p>
-                )}
-
-                {/* 🌟 Show booking created time */}
-                <p className="text-[11px] text-slate-400 mt-1">
-                  Booked on:{" "}
-                  {new Date(booking.createdAt).toLocaleDateString()}
+                <p className="text-xs text-slate-500">
+                  Location: {b.location || "N/A"} • Price: $
+                  {b.pricePerDay || 0} / day
                 </p>
               </div>
-
               <button
-                onClick={() => handleCancel(booking._id)}
-                className="px-3 py-1.5 text-xs bg-red-600 text-white rounded-lg hover:bg-red-700"
+                onClick={() => handleCancel(b._id)}
+                className="text-xs px-3 py-1.5 rounded bg-red-600 text-white hover:bg-red-700"
               >
                 Cancel
               </button>

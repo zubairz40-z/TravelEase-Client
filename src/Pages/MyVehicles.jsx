@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../Providers/AuthProvider";
 import api from "../api/axios";
-import { useNavigate } from "react-router";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router";
 
 const MyVehicles = () => {
   const { user } = useAuth();
@@ -12,6 +12,7 @@ const MyVehicles = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  // 🔹 Fetch vehicles for logged-in user
   useEffect(() => {
     if (!user?.email) return;
 
@@ -32,6 +33,7 @@ const MyVehicles = () => {
       });
   }, [user?.email]);
 
+  // 🔹 Delete vehicle
   const handleDelete = (id) => {
     const ok = window.confirm("Are you sure you want to delete this vehicle?");
     if (!ok) return;
