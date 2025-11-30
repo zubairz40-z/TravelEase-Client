@@ -31,24 +31,32 @@ const Home =()=>{
     ]
 
     useEffect(() => {
-    setLoading(true);
-    setError("");
+  setLoading(true);
+  setError("");
 
-    api
-      .get("/vehicles")
-      .then((res) => {
-        const all = res.data || [];
-        const topSix = all.slice(0, 6);
-        setLatestVehicles(topSix);
-      })
-      .catch((err) => {
-        console.error(err);
-        setError("Failed to load vehicles.");
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, []);
+  api
+    .get("/vehicles")
+    .then((res) => {
+      const all = res.data || [];
+
+      // ✅ Sort by createdAt (newest first)
+      const sorted = [...all].sort(
+        (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
+      );
+
+      // ✅ Take latest 6
+      const topSix = sorted.slice(0, 6);
+
+      setLatestVehicles(topSix);
+    })
+    .catch((err) => {
+      console.error(err);
+      setError("Failed to load vehicles.");
+    })
+    .finally(() => {
+      setLoading(false);
+    });
+}, []);
 
     return(
         <div className=" bg-slate-50">

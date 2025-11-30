@@ -73,7 +73,7 @@ const router = createBrowserRouter([
       <VehicleDetails />,
     </PrivateRoute>
     
-  ) ,
+  ) 
       },
       {
         path:"update-vehicle/:id",

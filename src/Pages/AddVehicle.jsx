@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import api from "../api/axios";
 import { useAuth } from "../Providers/AuthProvider";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router";
 
 const AddVehicle = () => {
   const { user } = useAuth();
@@ -77,7 +78,7 @@ const AddVehicle = () => {
       )}
 
       <form
-        onSubmit={handleSubmit}
+        onSubmit={handleAddVehicle}
         className="space-y-4 bg-white rounded-2xl shadow-sm border border-slate-100 p-6"
       >
         <div className="grid md:grid-cols-2 gap-4">
