@@ -146,7 +146,7 @@ const VehicleDetails = () => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto py-10 px-4 md:px-6 bg-slate-50">
+    <div className="max-w-5xl mx-auto py-10 px-4 md:px-6 bg-slate-100 m-15">
       {/* Back button */}
       <button
         onClick={() => navigate(-1)}

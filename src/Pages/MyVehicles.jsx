@@ -77,7 +77,7 @@ const MyVehicles = () => {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 min-h-[80vh]">
+    <div className="max-w-6xl mx-auto px-4 py-8 min-h-[80vh] m-15">
       <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">
         My Vehicles
       </h1>
