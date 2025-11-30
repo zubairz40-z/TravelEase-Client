@@ -1,14 +1,15 @@
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Banner from "../Components/Banner";
-import { fakeVehicles } from './../Components/fakeVehicles';
+import api from "../api/axios";
 import VehicleCard from "../Components/VehicleCard";
 import { NavLink } from 'react-router';
 
 const Home =()=>{
-    const sortedByDate =[...fakeVehicles].sort((a,b)=>new Date(b.createdAt) -new Date(a.createdAt))
+  const [latestVehicles, setLatestVehicles] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-    const latestVehicles =sortedByDate.slice(0,6)
 
     const categories = [
        {
@@ -28,6 +29,26 @@ const Home =()=>{
   img: "https://imgcdnused.carbay.com/PH/car_image/52025/1749883721967.jpeg",
 },
     ]
+
+    useEffect(() => {
+    setLoading(true);
+    setError("");
+
+    api
+      .get("/vehicles")
+      .then((res) => {
+        const all = res.data || [];
+        const topSix = all.slice(0, 6);
+        setLatestVehicles(topSix);
+      })
+      .catch((err) => {
+        console.error(err);
+        setError("Failed to load vehicles.");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
 
     return(
         <div className=" bg-slate-50">

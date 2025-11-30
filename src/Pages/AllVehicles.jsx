@@ -1,40 +1,102 @@
-import React, { useMemo, useState } from "react";
-import { fakeVehicles } from "../Components/fakeVehicles";
-import { div } from "framer-motion/client";
+import React, { useEffect, useMemo, useState } from "react";
+import api from "../api/axios";
+
 import VehicleCard from "../Components/VehicleCard";
 
 const AllVehicles =()=>{
 
+
+     const [vehicles, setVehicles] = useState([]);
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+
     const [selectedCategory,setSelectedCategory]=useState("All");
-    const [sortOption,setSortOption]=useState("default");
+    const [sortOption,setSortOption]=useState("latest");
 
-    const categories=["All",...new Set(fakeVehicles.map((v)=>v.category))]
+    
+  useEffect(() => {
+    setLoading(true);
+    setError("");
 
-    const filteredVehicles = useMemo(()=>{
-        let data = [...fakeVehicles]
+    api
+      .get("/vehicles")
+      .then((res) => {
+        setVehicles(res.data || []);
+      })
+      .catch((err) => {
+        console.error(err);
+        setError("Failed to load vehicles. Please try again.");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
+  const categories = useMemo(() => {
+    const set = new Set();
+    vehicles.forEach((v) => {
+      if (v.category) set.add(v.category);
+    });
+    return ["All", ...Array.from(set)];
+  }, [vehicles]);
 
-        if(selectedCategory != "All"){
-            data=data.filter((v)=>v.category === selectedCategory)
-        }
-
-        if( sortOption === "priceLowHigh"){
-            data.sort((a,b)=>a.pricePerDay-b.pricePerDay);
-        }else if (sortOption === "priceHighLow") {
-      data.sort((a, b) => b.pricePerDay - a.pricePerDay);
-    } else if (sortOption === "latest") {
-      data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+const filteredAndSortedVehicles = useMemo(() => {
+    let list = vehicles;
+    
+    if (selectedCategory !== "All") {
+      list = list.filter((v) => v.category === selectedCategory);
     }
 
-    return data;
-  }, [selectedCategory, sortOption]);
+    
+    const sorted = [...list];
+
+    if (sortOption === "priceLowHigh") {
+      sorted.sort(
+        (a, b) => (a.pricePerDay || 0) - (b.pricePerDay || 0)
+      );
+    } else if (sortOption === "priceHighLow") {
+      sorted.sort(
+        (a, b) => (b.pricePerDay || 0) - (a.pricePerDay || 0)
+      );
+    } else if (sortOption === "latest") {
+      
+      sorted.sort(
+        (a, b) =>
+          new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
+      );
+    }
+   
+    return sorted;
+  }, [vehicles, selectedCategory, sortOption]);
+
+  // 🔹 Loading state
+  if (loading) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="h-10 w-10 rounded-full border-4 border-red-600 border-t-transparent animate-spin" />
+      </div>
+    );
+  }
+
+  // 🔹 Error state
+  if (error) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <p className="text-red-600 text-sm">{error}</p>
+      </div>
+    );
+  }
 
 
+
+    
     return(
         <div className="max-w-6xl mx-auto space-y-6 py-10 px-4 md:px-6">
             <header className="space-y-2">
                 <h1 className="text-2xl md:text-3xl font-bold text-slate-900">All Vehicles</h1>
 
-                <p className="text-sm text-slate-800">Browse all available vehicles.You can filter by category and sort by price</p>
+                <p className="text-sm text-slate-800">Browse all available vehicles.You can filter by category or sort by price</p>
             </header>
 
             <div className="flex flex-col md:flex-row gap-3 md:items-center md:justify-between bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
@@ -71,12 +133,12 @@ const AllVehicles =()=>{
       </div>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredVehicles.length === 0 ? (
+        {filteredAndSortedVehicles.length === 0 ? (
           <p className="text-sm text-slate-600 col-span-full">
             No vehicles found for this filter.
           </p>
         ) : (
-          filteredVehicles.map((vehicle) => (
+           filteredAndSortedVehicles.map((vehicle) => (
             <VehicleCard key={vehicle._id} vehicle={vehicle} />
           ))
         )}

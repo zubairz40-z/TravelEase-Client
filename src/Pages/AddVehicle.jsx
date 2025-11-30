@@ -1,20 +1,26 @@
 import React from "react";
-
-
+import api from "../api/axios";
 import { useAuth } from "../Providers/AuthProvider";
 import toast from "react-hot-toast";
 
 const AddVehicle = () => {
   const { user } = useAuth();
+ const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const [loading, setLoading] = useState(false);
+
+  const handleAddVehicle = (e) => {
     e.preventDefault();
+    if (!user?.email) {
+      toast.error("You must be logged in to add a vehicle.");
+      return;
+    }
 
     const form = e.target;
     const vehicleName = form.vehicleName.value;
     const owner = form.owner.value;
     const category = form.category.value;
-    const pricePerDay = form.pricePerDay.value;
+    const pricePerDay = parseFloat(form.pricePerDay.value);
     const location = form.location.value;
     const availability = form.availability.value;
     const coverImage = form.coverImage.value;
@@ -34,11 +40,26 @@ const AddVehicle = () => {
       createdAt: new Date().toISOString(),
     };
 
-    console.log("Vehicle to send to server:", newVehicle);
-    toast.success("Vehicle form submitted (connect backend next)");
+     setLoading(true);
 
-    form.reset();
+    api
+      .post("/vehicles", newVehicle)
+      .then(() => {
+        toast.success("Vehicle added successfully");
+        form.reset();
+        navigate("/My-Vehicles");
+      })
+      .catch((err) => {
+        console.error(err);
+        toast.error("Failed to add vehicle");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
+
+   
+  
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
