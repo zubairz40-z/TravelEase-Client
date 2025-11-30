@@ -5,12 +5,12 @@ import { Outlet } from "react-router";
 
 const MainLayout =()=>{
     return(
-    <div className= "min-h-screen flex flex-col bg-slate-50">
+    <div className= "min-h-screen flex flex-col ">
         <header>
             <Navbar></Navbar>
         </header>
 
-        <main className="flex-1">
+        <main className="flex-1 bg-slate-100">
             <Outlet></Outlet>
         </main>
 

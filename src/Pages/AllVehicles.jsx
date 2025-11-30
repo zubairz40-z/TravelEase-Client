@@ -93,7 +93,7 @@ const filteredAndSortedVehicles = useMemo(() => {
 
     
     return(
-        <div className="max-w-6xl mx-auto space-y-6 py-10 px-4 md:px-6">
+        <div className="max-w-6xl mx-auto space-y-6 py-10 px-4 md:px-6 m-10">
 
 
             <header className="space-y-2">

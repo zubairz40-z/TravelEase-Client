@@ -75,7 +75,7 @@ const Register =()=>{
   };
 
     return(
-        <div className="min-h-[80vh] flex items-center justify-center bg-slate-50 px-4 m-10">
+        <div className="min-h-[80vh] flex items-center justify-center  px-4 m-10">
 
         
 

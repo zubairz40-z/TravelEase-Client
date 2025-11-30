@@ -1,18 +1,36 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-
-import './App.css'
+import { useState, useEffect } from "react";
+import { RouterProvider } from "react-router";
+import router from "./Routes/router"; // your router file
+import "./App.css";
 
 function App() {
-  const [count, setCount] = useState(0)
+  // theme state and load from localStorage
+  const [theme, setTheme] = useState(
+    localStorage.getItem("theme") || "light"
+  );
+
+  // theme effect
+  useEffect(() => {
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+    localStorage.setItem("theme", theme);
+  }, [theme]);
 
   return (
-    <>
-      
-      <h1>Vite + React</h1>
-    
-    </>
-  )
+    <div
+      className={
+        theme === "dark"
+          ? "bg-slate-900 text-slate-100 min-h-screen transition-colors"
+          : "bg-white text-slate-900 min-h-screen transition-colors"
+      }
+    >
+      {/* Make theme accessible in Navbar only */}
+      <RouterProvider router={router} />
+    </div>
+  );
 }
 
-export default App
+export default App;

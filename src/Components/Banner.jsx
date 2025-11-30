@@ -6,7 +6,7 @@ import { NavLink } from 'react-router';
 
  const Banner =()=>{
     return(
-        <div className='relative h-[90vh] w-full overflow-hidden'>
+        <div className='relative h-[100vh] w-full overflow-hidden'>
            
             <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover brightness-75" src="/car-banner-vid.mp4"></video>
 
