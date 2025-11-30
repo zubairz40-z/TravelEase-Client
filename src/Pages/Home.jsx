@@ -123,7 +123,8 @@ const Home = () => {
         </div>
 
       <div className="max-w-6xl mx-auto space-y-12 py-10 px-4 md:px-6">
-        {/* Recently Added Vehicles */}
+        {/* Recently Added Vehiclees */}
+
         <section className="space-y-4 px-4">
           <div>
             <h2
