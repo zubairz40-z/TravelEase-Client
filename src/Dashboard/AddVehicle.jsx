@@ -9,7 +9,7 @@ const AddVehicle = () => {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
-  const [coverImage, setCoverImage] = useState([""]);
+  const [coverImage, setCoverImage] = useState([""]); // starts with one field
 
   const [features, setFeatures] = useState({
     airConditioning: false,
@@ -20,21 +20,27 @@ const AddVehicle = () => {
     sunroof: false,
   });
 
+  // Handle feature checkbox change
   const handleFeatureChange = (e) => {
     const { name, checked } = e.target;
     setFeatures((prev) => ({ ...prev, [name]: checked }));
   };
 
+  // Handle cover image change
   const handleImageChange = (index, value) => {
     const updated = [...coverImage];
     updated[index] = value;
     setCoverImage(updated);
   };
 
+  // Add a new image field
   const addImageField = () => setCoverImage([...coverImage, ""]);
+
+  // Remove an image field
   const removeImageField = (index) =>
     setCoverImage(coverImage.filter((_, i) => i !== index));
 
+  // Submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -57,7 +63,7 @@ const AddVehicle = () => {
       fuelType: form.fuelType.value,
       mileage: `${form.mileage.value} km/l`,
       seats: Number(form.seats.value),
-      coverImage: coverImage.filter(Boolean),
+      coverImage: coverImage.filter(Boolean), // only non-empty URLs
       features,
       rating: 0,
       reviewsCount: 0,
@@ -69,7 +75,7 @@ const AddVehicle = () => {
       setLoading(true);
       await api.post("/vehicles", newVehicle);
       toast.success("Vehicle added successfully");
-      navigate("/my-vehicles");
+      navigate("/dashboard/my-vehicles");
     } catch (err) {
       console.error(err);
       toast.error("Failed to add vehicle");
@@ -91,8 +97,19 @@ const AddVehicle = () => {
       >
         {/* Name & Owner */}
         <div className="grid md:grid-cols-2 gap-4">
-          <input name="vehicleName" required placeholder="Vehicle Name" className="input" />
-          <input name="owner" defaultValue={user?.displayName || ""} required placeholder="Owner Name" className="input" />
+          <input
+            name="vehicleName"
+            required
+            placeholder="Vehicle Name"
+            className="input"
+          />
+          <input
+            name="owner"
+            defaultValue={user?.displayName || ""}
+            required
+            placeholder="Owner Name"
+            className="input"
+          />
         </div>
 
         {/* Category & Price */}
@@ -105,12 +122,23 @@ const AddVehicle = () => {
             <option>Electric</option>
             <option>Van</option>
           </select>
-          <input name="pricePerDay" type="number" required placeholder="Price per day" className="input" />
+          <input
+            name="pricePerDay"
+            type="number"
+            required
+            placeholder="Price per day"
+            className="input"
+          />
         </div>
 
         {/* Location & Availability */}
         <div className="grid md:grid-cols-2 gap-4">
-          <input name="location" required placeholder="Location" className="input" />
+          <input
+            name="location"
+            required
+            placeholder="Location"
+            className="input"
+          />
           <select name="availability" className="input">
             <option>Available</option>
             <option>Pending</option>
@@ -126,18 +154,30 @@ const AddVehicle = () => {
             <option>Manual</option>
           </select>
           <select name="fuelType" required className="input">
-            <option value="">Fuel</option>
+            <option value="">Fuel Type</option>
             <option>Petrol</option>
             <option>Diesel</option>
             <option>Electric</option>
             <option>Hybrid</option>
           </select>
-          <input name="seats" type="number" min="1" required placeholder="Seats" className="input" />
+          <input
+            name="seats"
+            type="number"
+            min="1"
+            required
+            placeholder="Seats"
+            className="input"
+          />
         </div>
 
-        <input name="mileage" required placeholder="Mileage (e.g. 10)" className="input" />
+        <input
+          name="mileage"
+          required
+          placeholder="Mileage (e.g. 10)"
+          className="input"
+        />
 
-        {/* Images */}
+        {/* Cover Images */}
         <div>
           <label className="font-medium">Cover Images</label>
           {coverImage.map((img, i) => (
@@ -149,13 +189,21 @@ const AddVehicle = () => {
                 className="input flex-1"
               />
               {i > 0 && (
-                <button type="button" onClick={() => removeImageField(i)} className="btn-red">
+                <button
+                  type="button"
+                  onClick={() => removeImageField(i)}
+                  className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
+                >
                   Remove
                 </button>
               )}
             </div>
           ))}
-          <button type="button" onClick={addImageField} className="btn-green mt-2">
+          <button
+            type="button"
+            onClick={addImageField}
+            className="mt-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
+          >
             Add Image
           </button>
         </div>
@@ -187,6 +235,7 @@ const AddVehicle = () => {
           className="input"
         />
 
+        {/* Submit */}
         <button
           disabled={loading}
           className="w-full bg-red-700 hover:bg-red-800 text-white py-3 rounded-lg font-semibold"

@@ -158,12 +158,7 @@ const MyVehicles = () => {
                     View Details
                   </button>
 
-                  <button
-                    onClick={() => navigate(`/update-vehicle/${vehicle._id}`)}
-                    className="flex-1 inline-flex items-center justify-center px-3 py-1.5 text-[11px] md:text-xs rounded-lg bg-amber-500 text-white hover:bg-amber-600"
-                  >
-                    Update
-                  </button>
+                 
 
                   <button
                     onClick={() => handleDelete(vehicle._id)}

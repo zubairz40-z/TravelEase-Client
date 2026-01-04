@@ -20,7 +20,7 @@ import { NavLink } from 'react-router';
                     <NavLink to="/All-Vehicles" className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg" >
                     Explore Vehicles</NavLink>
 
-                    <NavLink to="/Add-Vehicles" className=" px-6 py-3 bg-white hover:bg-gray-200 text-black rounded-lg text-lg font-semibold shadow-lg">
+                    <NavLink to="dashboard/add-vehicle" className=" px-6 py-3 bg-white hover:bg-gray-200 text-black rounded-lg text-lg font-semibold shadow-lg">
                         Add Your Vehicle
                     </NavLink>
                 </div>
