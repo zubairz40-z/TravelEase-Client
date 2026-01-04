@@ -14,7 +14,7 @@ const Contact = () => {
   };
 
   return (
-    <div className="space-y-16 flex flex-col">
+    <div className="space-y-16 flex flex-col p-10">
 
       {/* Hero / Top Section */}
       <div className="relative h-[50vh] w-full overflow-hidden rounded-2xl">
