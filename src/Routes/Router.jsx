@@ -18,6 +18,9 @@ import MyBookings from "../Dashboard/MyBookings";
 import UpdateVehicles from "../Dashboard/UpdateVehicle";
 import Profile from "../Dashboard/Profile";
 import Compare from "../Pages/Compare";
+import About from './../Pages/About';
+import Contact from './../Pages/Contact';
+
 
 const router = createBrowserRouter([
   {
@@ -28,13 +31,17 @@ const router = createBrowserRouter([
       { path: "/login", element: <Login /> },
       { path: "/register", element: <Register /> },
       {path: "/compare", element: <Compare></Compare>},
+      {
+        path: "/about", element: <About></About>
+      },
+      { path: "/contact", element: <Contact /> },
 
       {
         path: "/vehicles/:id",
         element: (
-          <PrivateRoute>
+        
             <VehicleDetails />
-          </PrivateRoute>
+      
         ),
       },
     ],
@@ -55,6 +62,7 @@ const router = createBrowserRouter([
       { path: "bookings", element: <MyBookings /> },
       { path: "update-vehicle/:id", element: <UpdateVehicles /> },
       { path: "profile", element: <Profile /> },
+      
     ],
   },
 
