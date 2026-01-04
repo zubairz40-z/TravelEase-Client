@@ -7,225 +7,241 @@ const Navbar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
 
   const navLinkClass = ({ isActive }) =>
     `px-4 py-1.5 text-sm font-semibold rounded-full transition-colors duration-150
-      ${
-        isActive
-          ? "bg-red-600 text-white shadow-sm"
-          : "text-slate-800 hover:bg-red-50 hover:text-red-700"
-      }`;
+     ${
+       isActive
+         ? "bg-white text-red-600 shadow-sm"
+         : "text-white hover:bg-red-500"
+     }`;
 
   const handleLogout = () => {
     logout()
       .then(() => {
         toast.success("Logged Out");
-        navigate("/");
+        navigate("/login");
       })
       .catch(() => toast.error("Logout failed"));
   };
 
-  const closeMenu = () => setIsOpen(false);
+  const closeMenu = () => {
+    setIsOpen(false);
+    setShowProfile(false);
+  };
 
   return (
-    <header className="fixed top-0 inset-x-0 z-50 bg-white border-b border-slate-200 shadow-sm">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* TOP BAR */}
-        <div className="flex items-center justify-between h-16 gap-3">
-          {/* LOGO + NAME */}
+    <header className="fixed top-0 inset-x-0 z-50 bg-red-800 shadow-md">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          {/* LOGO */}
           <div className="flex items-center gap-3">
             <NavLink to="/" onClick={closeMenu}>
               <img src="/sport-car.png" alt="Logo" className="w-10 h-10" />
             </NavLink>
-
             <NavLink to="/" onClick={closeMenu}>
-              <h3 className="text-2xl font-bold tracking-tight text-slate-900">
-                TravelEase
-              </h3>
+              <h2 className="text-xl font-bold text-white">TravelEase</h2>
             </NavLink>
           </div>
 
-          {/* NAV LINKS (DESKTOP) */}
-          <nav className="hidden lg:flex gap-x-4 items-center">
+          {/* DESKTOP NAV */}
+          <nav className="hidden lg:flex items-center gap-3">
             <NavLink to="/" className={navLinkClass}>
               Home
             </NavLink>
 
-            <NavLink to="/All-Vehicles" className={navLinkClass}>
+            <NavLink to="/all-vehicles" className={navLinkClass}>
               All Vehicles
             </NavLink>
 
-            <NavLink to="/Add-Vehicles" className={navLinkClass}>
-              Add Vehicle
-            </NavLink>
+            {user && (
+              <>
+                <NavLink to="/dashboard" className={navLinkClass}>
+                  Dashboard
+                </NavLink>
 
-            <NavLink to="/MyBookings" className={navLinkClass}>
-              My Bookings
-            </NavLink>
+                <NavLink to="/dashboard/bookings" className={navLinkClass}>
+                  My Bookings
+                </NavLink>
 
-            <NavLink to="/My-Vehicles" className={navLinkClass}>
-              My Vehicles
-            </NavLink>
+                <NavLink to="/dashboard/profile" className={navLinkClass}>
+                  Profile
+                </NavLink>
+              </>
+            )}
           </nav>
 
-          {/* RIGHT SIDE (DESKTOP) */}
+          {/* RIGHT SIDE DESKTOP */}
           <div className="hidden lg:flex items-center gap-4">
-            {user ? (
+            {!user ? (
               <>
-                {/* Avatar */}
-                <div
-                  className="flex items-center gap-2"
-                  title={user.displayName || user.email}
+                <NavLink to="/login" className={navLinkClass}>
+                  Login
+                </NavLink>
+
+                <NavLink to="/register">
+                  <button className="px-4 py-2 text-sm font-bold rounded-full bg-white text-red-600 hover:bg-red-100 transition">
+                    Register
+                  </button>
+                </NavLink>
+              </>
+            ) : (
+              <div className="relative">
+                {/* AVATAR */}
+                <button
+                  onClick={() => setShowProfile((prev) => !prev)}
+                  className="flex items-center gap-2 focus:outline-none"
                 >
                   {user.photoURL ? (
                     <img
                       src={user.photoURL}
                       alt="User"
-                      className="h-9 w-9 rounded-full object-cover border border-slate-300"
+                      className="h-9 w-9 rounded-full border border-white object-cover"
                     />
                   ) : (
-                    <div className="h-9 w-9 rounded-full bg-red-600 text-white flex items-center justify-center text-sm font-semibold">
-                      {user.displayName?.[0]?.toUpperCase() ||
-                        user.email?.[0]?.toUpperCase()}
+                    <div className="h-9 w-9 rounded-full bg-white text-red-600 flex items-center justify-center font-bold">
+                      {user.displayName?.[0] || user.email?.[0]}
                     </div>
                   )}
-                </div>
-
-                {/* Logout */}
-                <button
-                  onClick={handleLogout}
-                  className="px-4 py-2 text-sm rounded-full font-bold text-white bg-red-600 border border-red-600 hover:bg-transparent hover:text-red-600 transition-all"
-                >
-                  Log Out
                 </button>
-              </>
-            ) : (
-              <>
-                <NavLink to="/Login" className={navLinkClass}>
-                  Login
-                </NavLink>
 
-                <NavLink to="/Register">
-                  <button className="px-4 py-2.5 text-sm rounded-full font-bold text-white bg-red-600 border border-red-600 hover:bg-transparent hover:text-red-600 transition-all">
-                    Register
-                  </button>
-                </NavLink>
-              </>
+                {/* PROFILE DROPDOWN */}
+                {showProfile && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg overflow-hidden">
+                    <nav className="flex flex-col">
+                      <NavLink
+                        to="/dashboard/profile"
+                        onClick={closeMenu}
+                        className={({ isActive }) =>
+                          `px-4 py-2 text-sm transition-colors duration-200 ${
+                            isActive ? "bg-red-100 text-red-600" : "hover:bg-red-50"
+                          }`
+                        }
+                      >
+                        Profile
+                      </NavLink>
+
+                      <NavLink
+                        to="/dashboard/add-vehicle"
+                        onClick={closeMenu}
+                        className={({ isActive }) =>
+                          `px-4 py-2 text-sm transition-colors duration-200 ${
+                            isActive ? "bg-red-100 text-red-600" : "hover:bg-red-50"
+                          }`
+                        }
+                      >
+                        Add Vehicle
+                      </NavLink>
+
+                      <NavLink
+                        to="/dashboard/bookings"
+                        onClick={closeMenu}
+                        className={({ isActive }) =>
+                          `px-4 py-2 text-sm transition-colors duration-200 ${
+                            isActive ? "bg-red-100 text-red-600" : "hover:bg-red-50"
+                          }`
+                        }
+                      >
+                        My Bookings
+                      </NavLink>
+
+                      <button
+                        onClick={handleLogout}
+                        className="px-4 py-2 text-sm text-left transition-colors duration-200 hover:bg-red-50"
+                      >
+                        Logout
+                      </button>
+                    </nav>
+                  </div>
+                )}
+              </div>
             )}
           </div>
 
-          {/* MOBILE MENU BUTTON */}
+          {/* MOBILE BUTTON */}
           <button
-            className="lg:hidden inline-flex items-center justify-center p-2 border border-slate-300 rounded-md"
             onClick={() => setIsOpen((prev) => !prev)}
+            className="lg:hidden p-2 border border-white rounded-md text-white"
           >
-            <svg
-              className="h-5 w-5 text-slate-800"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              {isOpen ? (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              ) : (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              )}
-            </svg>
+            ☰
           </button>
         </div>
 
         {/* MOBILE MENU */}
         {isOpen && (
-          <div className="lg:hidden border-t border-slate-200 pb-4">
+          <div className="lg:hidden border-t border-red-500 pb-4">
             <nav className="flex flex-col gap-2 pt-3">
-              <NavLink
-                to="/"
-                className={navLinkClass}
-                onClick={closeMenu}
-              >
+              <NavLink to="/" onClick={closeMenu} className={navLinkClass}>
                 Home
               </NavLink>
 
               <NavLink
-                to="/All-Vehicles"
-                className={navLinkClass}
+                to="/all-vehicles"
                 onClick={closeMenu}
+                className={navLinkClass}
               >
                 All Vehicles
               </NavLink>
 
-              <NavLink
-                to="/Add-Vehicles"
-                className={navLinkClass}
-                onClick={closeMenu}
-              >
-                Add Vehicle
-              </NavLink>
-
-              <NavLink
-                to="/MyBookings"
-                className={navLinkClass}
-                onClick={closeMenu}
-              >
-                My Bookings
-              </NavLink>
-
-              <NavLink
-                to="/My-Vehicles"
-                className={navLinkClass}
-                onClick={closeMenu}
-              >
-                My Vehicles
-              </NavLink>
-            </nav>
-
-            <div className="mt-3 flex flex-col gap-2">
-              {user ? (
+              {user && (
                 <>
+                  <NavLink
+                    to="/dashboard"
+                    onClick={closeMenu}
+                    className={navLinkClass}
+                  >
+                    Dashboard
+                  </NavLink>
+
+                  <NavLink
+                    to="/dashboard/bookings"
+                    onClick={closeMenu}
+                    className={navLinkClass}
+                  >
+                    My Bookings
+                  </NavLink>
+
+                  <NavLink
+                    to="/dashboard/profile"
+                    onClick={closeMenu}
+                    className={navLinkClass}
+                  >
+                    Profile
+                  </NavLink>
+
                   <button
                     onClick={() => {
                       closeMenu();
                       handleLogout();
                     }}
-                    className="w-full px-4 py-2 text-sm rounded-full font-bold text-white bg-red-600 border border-red-600 hover:bg-transparent hover:text-red-600 transition-all"
+                    className="w-full px-4 py-2 text-sm font-bold rounded-full bg-white text-red-600"
                   >
                     Log Out
                   </button>
                 </>
-              ) : (
-                <>
+              )}
+
+              {!user && (
+                <div className="flex flex-col gap-2">
                   <NavLink
-                    to="/Login"
+                    to="/login"
                     onClick={closeMenu}
-                    className="w-full"
+                    className="px-4 py-2 text-center rounded-full bg-white text-red-600"
                   >
-                    <div className="w-full text-center px-4 py-2 text-sm font-semibold rounded-full text-slate-800 border border-slate-300 hover:bg-red-50 hover:text-red-700 transition-colors">
-                      Login
-                    </div>
+                    Login
                   </NavLink>
 
                   <NavLink
-                    to="/Register"
+                    to="/register"
                     onClick={closeMenu}
-                    className="w-full"
+                    className="px-4 py-2 text-center rounded-full bg-red-500 text-white"
                   >
-                    <div className="w-full text-center px-4 py-2 text-sm font-bold rounded-full text-white bg-red-600 border border-red-600 hover:bg-transparent hover:text-red-600 transition-all">
-                      Register
-                    </div>
+                    Register
                   </NavLink>
-                </>
+                </div>
               )}
-            </div>
+            </nav>
           </div>
         )}
       </div>

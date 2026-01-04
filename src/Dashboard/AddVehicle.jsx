@@ -6,9 +6,10 @@ import { useNavigate } from "react-router";
 
 const AddVehicle = () => {
   const { user } = useAuth();
- const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
+  const [imageUrls, setImageUrls] = useState([""]);
 
   const handleAddVehicle = (e) => {
     e.preventDefault();
@@ -18,36 +19,31 @@ const AddVehicle = () => {
     }
 
     const form = e.target;
-    const vehicleName = form.vehicleName.value;
-    const owner = form.owner.value;
-    const category = form.category.value;
-    const pricePerDay = parseFloat(form.pricePerDay.value);
-    const location = form.location.value;
-    const availability = form.availability.value;
-    const coverImage = form.coverImage.value;
-    const description = form.description.value;
-    const userEmail = user?.email;
-
     const newVehicle = {
-      vehicleName,
-      owner,
-      category,
-      pricePerDay: Number(pricePerDay),
-      location,
-      availability,
-      coverImage,
-      description,
-      userEmail,
+      vehicleName: form.vehicleName.value,
+      owner: form.owner.value,
+      category: form.category.value,
+      pricePerDay: parseFloat(form.pricePerDay.value),
+      location: form.location.value,
+      availability: form.availability.value,
+      description: form.description.value,
+      userEmail: user.email,
       createdAt: new Date().toISOString(),
+      transmission: form.transmission.value,
+      fuelType: form.fuelType.value,
+      mileage: form.mileage.value,
+      seats: parseInt(form.seats.value),
+      images: imageUrls.filter((url) => url.trim() !== ""), // remove empty URLs
     };
 
-     setLoading(true);
+    setLoading(true);
 
     api
       .post("/vehicles", newVehicle)
       .then(() => {
         toast.success("Vehicle added successfully");
         form.reset();
+        setImageUrls([""]);
         navigate("/My-Vehicles");
       })
       .catch((err) => {
@@ -59,11 +55,18 @@ const AddVehicle = () => {
       });
   };
 
-   
-  
+  const handleImageChange = (index, value) => {
+    const newImages = [...imageUrls];
+    newImages[index] = value;
+    setImageUrls(newImages);
+  };
+
+  const addImageField = () => setImageUrls([...imageUrls, ""]);
+  const removeImageField = (index) =>
+    setImageUrls(imageUrls.filter((_, i) => i !== index));
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8">
+    <div className="max-w-4xl mx-auto px-4 py-8 pt-10">
       <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">
         Add a Vehicle
       </h1>
@@ -81,6 +84,7 @@ const AddVehicle = () => {
         onSubmit={handleAddVehicle}
         className="space-y-4 bg-white rounded-2xl shadow-sm border border-slate-100 p-6"
       >
+        {/* Vehicle Name & Owner */}
         <div className="grid md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">
@@ -94,7 +98,6 @@ const AddVehicle = () => {
               placeholder="Toyota Corolla"
             />
           </div>
-
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">
               Owner Name
@@ -103,13 +106,14 @@ const AddVehicle = () => {
               type="text"
               name="owner"
               required
+              defaultValue={user?.displayName || ""}
               className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-red-600"
               placeholder="Your Name"
-              defaultValue={user?.displayName || ""}
             />
           </div>
         </div>
 
+        {/* Category & Price */}
         <div className="grid md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">
@@ -127,7 +131,6 @@ const AddVehicle = () => {
               <option value="Van">Van</option>
             </select>
           </div>
-
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">
               Price Per Day (USD)
@@ -143,6 +146,7 @@ const AddVehicle = () => {
           </div>
         </div>
 
+        {/* Location & Availability */}
         <div className="grid md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">
@@ -156,7 +160,6 @@ const AddVehicle = () => {
               placeholder="Dhaka, Bangladesh"
             />
           </div>
-
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">
               Availability
@@ -172,19 +175,105 @@ const AddVehicle = () => {
           </div>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">
-            Cover Image URL
-          </label>
-          <input
-            type="text"
-            name="coverImage"
-            required
-            className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-red-600"
-            placeholder="https://..."
-          />
+        {/* Extra Specs */}
+        <div className="grid md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+              Transmission
+            </label>
+            <select
+              name="transmission"
+              required
+              className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-red-600"
+            >
+              <option value="">Select Transmission</option>
+              <option value="Automatic">Automatic</option>
+              <option value="Manual">Manual</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+              Fuel Type
+            </label>
+            <select
+              name="fuelType"
+              required
+              className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-red-600"
+            >
+              <option value="">Select Fuel</option>
+              <option value="Petrol">Petrol</option>
+              <option value="Diesel">Diesel</option>
+              <option value="Electric">Electric</option>
+              <option value="Hybrid">Hybrid</option>
+            </select>
+          </div>
         </div>
 
+        {/* Mileage & Seats */}
+        <div className="grid md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+              Mileage (km/l)
+            </label>
+            <input
+              type="number"
+              name="mileage"
+              required
+              min="0"
+              className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-red-600"
+              placeholder="15"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+              Seats
+            </label>
+            <input
+              type="number"
+              name="seats"
+              required
+              min="1"
+              className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-red-600"
+              placeholder="5"
+            />
+          </div>
+        </div>
+
+        {/* Multiple Images */}
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">
+            Images URLs
+          </label>
+          {imageUrls.map((url, index) => (
+            <div key={index} className="flex items-center gap-2 mb-2">
+              <input
+                type="text"
+                value={url}
+                onChange={(e) => handleImageChange(index, e.target.value)}
+                placeholder="https://..."
+                className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-red-600"
+              />
+              {index > 0 && (
+                <button
+                  type="button"
+                  onClick={() => removeImageField(index)}
+                  className="px-2 py-1 text-white bg-red-600 rounded-lg hover:bg-red-700"
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={addImageField}
+            className="mt-1 px-3 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700"
+          >
+            Add Another Image
+          </button>
+        </div>
+
+        {/* Description */}
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">
             Description
@@ -198,6 +287,7 @@ const AddVehicle = () => {
           ></textarea>
         </div>
 
+        {/* User Email */}
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">
             Your Email (owner)
@@ -216,10 +306,10 @@ const AddVehicle = () => {
 
         <button
           type="submit"
-          disabled={!user}
+          disabled={!user || loading}
           className="w-full mt-2 py-2.5 rounded-lg bg-red-700 text-white text-sm font-semibold hover:bg-red-800 disabled:bg-slate-400 disabled:cursor-not-allowed"
         >
-          Add Vehicle
+          {loading ? "Adding..." : "Add Vehicle"}
         </button>
       </form>
     </div>

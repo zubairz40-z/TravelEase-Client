@@ -5,6 +5,7 @@ import { format } from "date-fns";
 import { useAuth } from "../Providers/AuthProvider";
 import toast from "react-hot-toast";
 import { IoMdArrowRoundBack } from "react-icons/io";
+import { FaStar } from "react-icons/fa";
 
 const VehicleDetails = () => {
   const { id } = useParams();
@@ -16,9 +17,12 @@ const VehicleDetails = () => {
   const [bookingLoading, setBookingLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // booking dates
+  // Booking dates
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+
+  // Carousel state
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
     setLoading(true);
@@ -26,16 +30,12 @@ const VehicleDetails = () => {
 
     api
       .get(`/vehicles/${id}`)
-      .then((res) => {
-        setVehicle(res.data);
-      })
+      .then((res) => setVehicle(res.data))
       .catch((err) => {
         console.error(err);
         setError("Failed to load vehicle details.");
       })
-      .finally(() => {
-        setLoading(false);
-      });
+      .finally(() => setLoading(false));
   }, [id]);
 
   if (loading) {
@@ -73,25 +73,26 @@ const VehicleDetails = () => {
     description,
     coverImage,
     createdAt,
+    rating,
+    reviewsCount,
+    transmission,
+    fuelType,
+    mileage,
+    seats,
+    features = {},
   } = vehicle;
 
-  let formattedDate = "";
-  if (createdAt) {
-    try {
-      formattedDate = format(new Date(createdAt), "dd MMM yyyy, hh:mm a");
-    } catch {
-      formattedDate = createdAt;
-    }
-  }
+  const formattedDate = createdAt
+    ? format(new Date(createdAt), "dd MMM yyyy, hh:mm a")
+    : "";
 
-  // 🧠 BOOK NOW -> POST /bookings with dates
   const handleBookNow = () => {
     if (!user?.email) {
       toast.error("Please login to book this vehicle.");
       return;
     }
 
-    if (availability === "Booked") {
+    if (availability !== "Available") {
       toast.error("This vehicle is already booked.");
       return;
     }
@@ -132,21 +133,16 @@ const VehicleDetails = () => {
 
     api
       .post("/bookings", bookingData)
-      .then(() => {
-        toast.success("Booking request placed!");
-        // optional: navigate("/MyBookings");
-      })
+      .then(() => toast.success("Booking request placed!"))
       .catch((err) => {
         console.error(err);
         toast.error("Failed to place booking.");
       })
-      .finally(() => {
-        setBookingLoading(false);
-      });
+      .finally(() => setBookingLoading(false));
   };
 
   return (
-    <div className="max-w-5xl mx-auto py-10 px-4 md:px-6 bg-slate-100 m-15">
+    <div className="max-w-5xl mx-auto py-10 px-4 md:px-6 bg-slate-100">
       {/* Back button */}
       <button
         onClick={() => navigate(-1)}
@@ -156,19 +152,61 @@ const VehicleDetails = () => {
         Back
       </button>
 
-      {/* Main card */}
+      {/* Vehicle card */}
       <div className="grid md:grid-cols-2 gap-8 bg-white rounded-2xl shadow-sm">
-        {/* Image */}
-        <div className="relative h-64 md:h-full overflow-hidden">
-          <img
-            src={coverImage}
-            alt={vehicleName}
-            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300 rounded-2xl"
-          />
+        {/* Image Carousel */}
+        <div className="relative h-64 md:h-full overflow-hidden rounded-2xl">
+          {coverImage && coverImage.length > 0 && (
+            <div className="relative h-full w-full">
+              <img
+                src={coverImage[currentImageIndex]}
+                alt={vehicleName}
+                className="w-full h-full object-cover transition-transform duration-300 rounded-2xl"
+              />
+
+              {/* Prev/Next Buttons */}
+              {coverImage.length > 1 && (
+                <>
+                  <button
+                    onClick={() =>
+                      setCurrentImageIndex(
+                        (prev) => (prev - 1 + coverImage.length) % coverImage.length
+                      )
+                    }
+                    className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/40 text-white p-2 rounded-full hover:bg-black/60 transition"
+                  >
+                    &#10094;
+                  </button>
+                  <button
+                    onClick={() =>
+                      setCurrentImageIndex((prev) => (prev + 1) % coverImage.length)
+                    }
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/40 text-white p-2 rounded-full hover:bg-black/60 transition"
+                  >
+                    &#10095;
+                  </button>
+                </>
+              )}
+
+              {/* Dots */}
+              {coverImage.length > 1 && (
+                <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-1">
+                  {coverImage.map((_, idx) => (
+                    <span
+                      key={idx}
+                      className={`w-2 h-2 rounded-full ${
+                        idx === currentImageIndex ? "bg-white" : "bg-gray-400"
+                      }`}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Details */}
-        <div className="p-6 space-y-4">
+        <div className="p-6 flex flex-col space-y-4">
           <div className="flex items-center justify-between gap-3">
             <h1 className="text-2xl md:text-3xl font-bold text-slate-900">
               {vehicleName}
@@ -182,30 +220,64 @@ const VehicleDetails = () => {
             </span>
           </div>
 
+          {/* Owner */}
           <p className="text-sm text-slate-600">
-            <span className="font-semibold text-slate-800">Owner:</span>{" "}
-            {owner || "N/A"}
+            <span className="font-semibold text-slate-800">Owner:</span> {owner}
           </p>
 
+          {/* Category, Location, Price */}
           <div className="text-sm text-slate-600 space-y-1">
             <p>
-              <span className="font-semibold text-slate-800">Category:</span>{" "}
-              {category}
+              <span className="font-semibold text-slate-800">Category:</span> {category}
             </p>
             <p>
-              <span className="font-semibold text-slate-800">Location:</span>{" "}
-              {location}
+              <span className="font-semibold text-slate-800">Location:</span> {location}
             </p>
             <p>
-              <span className="font-semibold text-slate-800">Price:</span> $
-              {pricePerDay} / day
+              <span className="font-semibold text-slate-800">Price:</span> ${pricePerDay}/day
             </p>
             {formattedDate && (
               <p className="text-xs text-slate-400">Listed on: {formattedDate}</p>
             )}
           </div>
 
-          {/* Booking dates */}
+          {/* Key Specs */}
+          <div className="mt-2">
+            <h3 className="font-semibold text-slate-900 text-sm mb-1">Key Specs:</h3>
+            <ul className="text-slate-700 text-sm space-y-1 list-disc list-inside">
+              <li>Transmission: {transmission || "N/A"}</li>
+              <li>Fuel Type: {fuelType || "N/A"}</li>
+              <li>Mileage: {mileage || "N/A"}</li>
+              <li>Seats: {seats || "N/A"}</li>
+              {Object.keys(features).length > 0 && (
+                <li>
+                  Features:{" "}
+                  {Object.keys(features)
+                    .filter((f) => features[f])
+                    .join(", ")}
+                </li>
+              )}
+            </ul>
+          </div>
+
+          {/* Rating */}
+          {rating && (
+            <div className="flex items-center gap-2">
+              <span className="flex items-center gap-1 text-yellow-500">
+                {[...Array(5)].map((_, i) => (
+                  <FaStar
+                    key={i}
+                    className={i < Math.round(rating) ? "fill-current" : "text-slate-300"}
+                  />
+                ))}
+              </span>
+              <span className="text-sm text-slate-600">
+                {rating} ({reviewsCount} reviews)
+              </span>
+            </div>
+          )}
+
+          {/* Booking Dates */}
           <div className="grid md:grid-cols-2 gap-3 mt-3">
             <div>
               <label className="block text-xs font-medium text-slate-700 mb-1">
@@ -231,13 +303,13 @@ const VehicleDetails = () => {
             </div>
           </div>
 
+          {/* Description */}
           <div>
-            <h2 className="text-base font-semibold text-slate-900 mb-1">
-              Description
-            </h2>
+            <h2 className="text-base font-semibold text-slate-900 mb-1">Description</h2>
             <p className="text-sm text-slate-700">{description}</p>
           </div>
 
+          {/* Book Now */}
           <button
             onClick={handleBookNow}
             disabled={bookingLoading}
@@ -248,7 +320,7 @@ const VehicleDetails = () => {
         </div>
       </div>
 
-      {/* Bottom promo section */}
+      {/* Promo Section */}
       <div className="relative h-[90vh] w-full overflow-hidden mt-10 rounded-2xl">
         <video
           autoPlay
@@ -257,18 +329,15 @@ const VehicleDetails = () => {
           playsInline
           className="absolute inset-0 w-full h-full object-cover brightness-75 rounded-2xl"
           src="/cardetails.page.mp4"
-        ></video>
-
+        />
         <div className="absolute inset-0 bg-black/40" />
         <div className="text-white relative z-10 flex flex-col items-center justify-center text-center h-full">
           <h1 className="text-3xl md:text-6xl font-bold drop-shadow-xl">
             Top-Rated Vehicle Booking Platform In Country
           </h1>
-
           <p className="mt-4 text-lg md:text-2xl drop-shadow-lg">
             Customer Approved. Traveler Trusted.
           </p>
-
           <div className="mt-8 flex gap-4">
             <NavLink
               to="/All-Vehicles"
