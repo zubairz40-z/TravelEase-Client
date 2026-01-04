@@ -9,305 +9,187 @@ const AddVehicle = () => {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
-  const [imageUrls, setImageUrls] = useState([""]);
+  const [coverImage, setCoverImage] = useState([""]);
 
-  const handleAddVehicle = (e) => {
+  const [features, setFeatures] = useState({
+    airConditioning: false,
+    bluetooth: false,
+    gps: false,
+    backupCamera: false,
+    cruiseControl: false,
+    sunroof: false,
+  });
+
+  const handleFeatureChange = (e) => {
+    const { name, checked } = e.target;
+    setFeatures((prev) => ({ ...prev, [name]: checked }));
+  };
+
+  const handleImageChange = (index, value) => {
+    const updated = [...coverImage];
+    updated[index] = value;
+    setCoverImage(updated);
+  };
+
+  const addImageField = () => setCoverImage([...coverImage, ""]);
+  const removeImageField = (index) =>
+    setCoverImage(coverImage.filter((_, i) => i !== index));
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!user?.email) {
-      toast.error("You must be logged in to add a vehicle.");
+      toast.error("Login required");
       return;
     }
 
     const form = e.target;
+
     const newVehicle = {
       vehicleName: form.vehicleName.value,
       owner: form.owner.value,
       category: form.category.value,
-      pricePerDay: parseFloat(form.pricePerDay.value),
+      pricePerDay: Number(form.pricePerDay.value),
       location: form.location.value,
       availability: form.availability.value,
       description: form.description.value,
-      userEmail: user.email,
-      createdAt: new Date().toISOString(),
       transmission: form.transmission.value,
       fuelType: form.fuelType.value,
-      mileage: form.mileage.value,
-      seats: parseInt(form.seats.value),
-      images: imageUrls.filter((url) => url.trim() !== ""), // remove empty URLs
+      mileage: `${form.mileage.value} km/l`,
+      seats: Number(form.seats.value),
+      coverImage: coverImage.filter(Boolean),
+      features,
+      rating: 0,
+      reviewsCount: 0,
+      userEmail: user.email,
+      createdAt: new Date(),
     };
 
-    setLoading(true);
-
-    api
-      .post("/vehicles", newVehicle)
-      .then(() => {
-        toast.success("Vehicle added successfully");
-        form.reset();
-        setImageUrls([""]);
-        navigate("/My-Vehicles");
-      })
-      .catch((err) => {
-        console.error(err);
-        toast.error("Failed to add vehicle");
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    try {
+      setLoading(true);
+      await api.post("/vehicles", newVehicle);
+      toast.success("Vehicle added successfully");
+      navigate("/my-vehicles");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to add vehicle");
+    } finally {
+      setLoading(false);
+    }
   };
-
-  const handleImageChange = (index, value) => {
-    const newImages = [...imageUrls];
-    newImages[index] = value;
-    setImageUrls(newImages);
-  };
-
-  const addImageField = () => setImageUrls([...imageUrls, ""]);
-  const removeImageField = (index) =>
-    setImageUrls(imageUrls.filter((_, i) => i !== index));
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8 pt-10">
-      <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">
-        Add a Vehicle
-      </h1>
-      <p className="text-sm text-slate-600 mb-6">
-        Fill in the details of the vehicle you want to list for rent.
+    <div className="max-w-4xl mx-auto py-10 px-4">
+      <h1 className="text-3xl font-bold mb-2">Add Vehicle</h1>
+      <p className="text-slate-600 mb-6">
+        List your vehicle for rent on TravelEase
       </p>
 
-      {!user && (
-        <p className="text-sm text-red-600 mb-4">
-          You must be logged in to add a vehicle.
-        </p>
-      )}
-
       <form
-        onSubmit={handleAddVehicle}
-        className="space-y-4 bg-white rounded-2xl shadow-sm border border-slate-100 p-6"
+        onSubmit={handleSubmit}
+        className="bg-white p-6 rounded-2xl shadow space-y-5"
       >
-        {/* Vehicle Name & Owner */}
+        {/* Name & Owner */}
         <div className="grid md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              Vehicle Name
-            </label>
-            <input
-              type="text"
-              name="vehicleName"
-              required
-              className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-red-600"
-              placeholder="Toyota Corolla"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              Owner Name
-            </label>
-            <input
-              type="text"
-              name="owner"
-              required
-              defaultValue={user?.displayName || ""}
-              className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-red-600"
-              placeholder="Your Name"
-            />
-          </div>
+          <input name="vehicleName" required placeholder="Vehicle Name" className="input" />
+          <input name="owner" defaultValue={user?.displayName || ""} required placeholder="Owner Name" className="input" />
         </div>
 
         {/* Category & Price */}
         <div className="grid md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              Category
-            </label>
-            <select
-              name="category"
-              required
-              className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-red-600"
-            >
-              <option value="">Select category</option>
-              <option value="Sedan">Sedan</option>
-              <option value="SUV">SUV</option>
-              <option value="Electric">Electric</option>
-              <option value="Van">Van</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              Price Per Day (USD)
-            </label>
-            <input
-              type="number"
-              name="pricePerDay"
-              required
-              min="0"
-              className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-red-600"
-              placeholder="70"
-            />
-          </div>
+          <select name="category" required className="input">
+            <option value="">Select Category</option>
+            <option>Sedan</option>
+            <option>SUV</option>
+            <option>Sports</option>
+            <option>Electric</option>
+            <option>Van</option>
+          </select>
+          <input name="pricePerDay" type="number" required placeholder="Price per day" className="input" />
         </div>
 
         {/* Location & Availability */}
         <div className="grid md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              Location
-            </label>
-            <input
-              type="text"
-              name="location"
-              required
-              className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-red-600"
-              placeholder="Dhaka, Bangladesh"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              Availability
-            </label>
-            <select
-              name="availability"
-              required
-              className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-red-600"
-            >
-              <option value="Available">Available</option>
-              <option value="Booked">Booked</option>
-            </select>
-          </div>
+          <input name="location" required placeholder="Location" className="input" />
+          <select name="availability" className="input">
+            <option>Available</option>
+            <option>Pending</option>
+            <option>Booked</option>
+          </select>
         </div>
 
-        {/* Extra Specs */}
-        <div className="grid md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              Transmission
-            </label>
-            <select
-              name="transmission"
-              required
-              className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-red-600"
-            >
-              <option value="">Select Transmission</option>
-              <option value="Automatic">Automatic</option>
-              <option value="Manual">Manual</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              Fuel Type
-            </label>
-            <select
-              name="fuelType"
-              required
-              className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-red-600"
-            >
-              <option value="">Select Fuel</option>
-              <option value="Petrol">Petrol</option>
-              <option value="Diesel">Diesel</option>
-              <option value="Electric">Electric</option>
-              <option value="Hybrid">Hybrid</option>
-            </select>
-          </div>
+        {/* Specs */}
+        <div className="grid md:grid-cols-3 gap-4">
+          <select name="transmission" required className="input">
+            <option value="">Transmission</option>
+            <option>Automatic</option>
+            <option>Manual</option>
+          </select>
+          <select name="fuelType" required className="input">
+            <option value="">Fuel</option>
+            <option>Petrol</option>
+            <option>Diesel</option>
+            <option>Electric</option>
+            <option>Hybrid</option>
+          </select>
+          <input name="seats" type="number" min="1" required placeholder="Seats" className="input" />
         </div>
 
-        {/* Mileage & Seats */}
-        <div className="grid md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              Mileage (km/l)
-            </label>
-            <input
-              type="number"
-              name="mileage"
-              required
-              min="0"
-              className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-red-600"
-              placeholder="15"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              Seats
-            </label>
-            <input
-              type="number"
-              name="seats"
-              required
-              min="1"
-              className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-red-600"
-              placeholder="5"
-            />
-          </div>
-        </div>
+        <input name="mileage" required placeholder="Mileage (e.g. 10)" className="input" />
 
-        {/* Multiple Images */}
+        {/* Images */}
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">
-            Images URLs
-          </label>
-          {imageUrls.map((url, index) => (
-            <div key={index} className="flex items-center gap-2 mb-2">
+          <label className="font-medium">Cover Images</label>
+          {coverImage.map((img, i) => (
+            <div key={i} className="flex gap-2 mt-2">
               <input
-                type="text"
-                value={url}
-                onChange={(e) => handleImageChange(index, e.target.value)}
-                placeholder="https://..."
-                className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-red-600"
+                value={img}
+                onChange={(e) => handleImageChange(i, e.target.value)}
+                placeholder="Image URL"
+                className="input flex-1"
               />
-              {index > 0 && (
-                <button
-                  type="button"
-                  onClick={() => removeImageField(index)}
-                  className="px-2 py-1 text-white bg-red-600 rounded-lg hover:bg-red-700"
-                >
+              {i > 0 && (
+                <button type="button" onClick={() => removeImageField(i)} className="btn-red">
                   Remove
                 </button>
               )}
             </div>
           ))}
-          <button
-            type="button"
-            onClick={addImageField}
-            className="mt-1 px-3 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700"
-          >
-            Add Another Image
+          <button type="button" onClick={addImageField} className="btn-green mt-2">
+            Add Image
           </button>
         </div>
 
-        {/* Description */}
+        {/* Features */}
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">
-            Description
-          </label>
-          <textarea
-            name="description"
-            rows="3"
-            required
-            className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-red-600"
-            placeholder="Comfortable 5-seater with A/C and GPS."
-          ></textarea>
+          <label className="font-medium mb-2 block">Features</label>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {Object.keys(features).map((feature) => (
+              <label key={feature} className="flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  name={feature}
+                  checked={features[feature]}
+                  onChange={handleFeatureChange}
+                />
+                {feature.replace(/([A-Z])/g, " $1")}
+              </label>
+            ))}
+          </div>
         </div>
 
-        {/* User Email */}
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">
-            Your Email (owner)
-          </label>
-          <input
-            type="email"
-            name="userEmail"
-            value={user?.email || ""}
-            readOnly
-            className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm bg-slate-100"
-          />
-          <p className="text-[11px] text-slate-500 mt-1">
-            This email will be stored as the owner of this vehicle.
-          </p>
-        </div>
+        {/* Description */}
+        <textarea
+          name="description"
+          required
+          rows="4"
+          placeholder="Vehicle description"
+          className="input"
+        />
 
         <button
-          type="submit"
-          disabled={!user || loading}
-          className="w-full mt-2 py-2.5 rounded-lg bg-red-700 text-white text-sm font-semibold hover:bg-red-800 disabled:bg-slate-400 disabled:cursor-not-allowed"
+          disabled={loading}
+          className="w-full bg-red-700 hover:bg-red-800 text-white py-3 rounded-lg font-semibold"
         >
           {loading ? "Adding..." : "Add Vehicle"}
         </button>

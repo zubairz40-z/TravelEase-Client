@@ -17,6 +17,7 @@ import MyVehicles from "../Dashboard/MyVehicles";
 import MyBookings from "../Dashboard/MyBookings";
 import UpdateVehicles from "../Dashboard/UpdateVehicle";
 import Profile from "../Dashboard/Profile";
+import Compare from "../Pages/Compare";
 
 const router = createBrowserRouter([
   {
@@ -26,6 +27,7 @@ const router = createBrowserRouter([
       { path: "/all-vehicles", element: <AllVehicles /> },
       { path: "/login", element: <Login /> },
       { path: "/register", element: <Register /> },
+      {path: "/compare", element: <Compare></Compare>},
 
       {
         path: "/vehicles/:id",
